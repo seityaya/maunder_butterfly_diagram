@@ -38,7 +38,7 @@ def download_FITS(link: str, prefix: str, beg_year: int, end_year: int, file_dir
     for y in range(beg_year, end_year + 1):
         url = link.format(prefix=prefix, year = y)
         filename = os.path.basename(url)
-        if not os.path.exists(path=os.path.join(path, filename)):
+        if not os.path.exists(os.path.join(path, filename)):
             silent_print(silent, "Download file: ", filename)
             wget.download(url=url, out=path)
         else:
@@ -294,7 +294,7 @@ END_YEAR = 2016
 
 setting = {
         'latitude_limit':      65,           # Значение крайнего положения широты, максимум 90
-        'latitude_step':       5,            # Шаг широты
+        'latitude_step':       1,            # Шаг широты
         'area_column':         'AREAS_1',    # Колонка площадей пятен, по которой будет производится построение графика
         'area_multiple':       1,            # Множитель, на которую будет умножаться площадь пятна
 }
