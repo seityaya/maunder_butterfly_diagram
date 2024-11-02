@@ -6,7 +6,6 @@
 #Copyright © 2024-2024 Seityagiya Terlekchi. All rights reserved.
 
 
-from tabulate import tabulate
 import time
 import datetime
 
@@ -16,7 +15,6 @@ import csv
 
 import matplotlib.pyplot as plt
 import numpy             as np
-import matplotlib.cbook  as cbook
 
 
 def silent_print(silent, *args):
@@ -24,16 +22,6 @@ def silent_print(silent, *args):
         for each in args:
             print(each, end='')
         print()
-
-
-def print_data(data: list[str], format = None):
-    for d in data:
-        print(d)
-
-
-def print_csv(data: list[list[str]]):
-    print(tabulate(data, headers='firstrow', tablefmt='fancy_grid', floatfmt='.8f'))
-
 
 
 # Загружает файлы FITS с сервера в папку
@@ -144,7 +132,7 @@ def convert_FITS_ASCII_to_CSV(format, fits_file: str, file_dir: str, file_name: 
     silent_print(silent, "==============")
     return file
 
-def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name, step, silent=False) -> str:
+def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name, setting, silent=False) -> str:
     silent_print(silent, "==============")
     silent_print(silent, "Transform data begin")
 
@@ -157,24 +145,17 @@ def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name,
     data = []
     for r in fd_r_csv:
         dt = ("{y}.{m}.{d} {H}:{M}:{S}").format(y=r["YEAR"], m=r["MONTH"], d=r["DAY"], H=r["HOUR"], M=r["MINUTE"], S=r["SECOND"])
-        spot = r["AREAS_4"]
+        spot = r[setting["area_column"]]
         lat = r["LAT-DE"]
 
         k = {}
         k["DateTime"] = dt
-        for i in range(-90, +90, step):
-            f = str("{i}_{i_n}").format(i=i, i_n=i+step)
+        for i in range(setting["latitude_step_limit"] * -1, setting["latitude_step_limit"] * +1, setting["latitude_step"]):
+            f = str("{i}_{i_n}").format(i=i, i_n=i + setting["latitude_step"])
             k[f] = "0"
-            if(float(lat) > i and float(lat) < i + step):
-                k[f] = spot
+            if(float(lat) > i and float(lat) < i + setting["latitude_step"]):
+                k[f] = int(spot) * setting["area_multiple"]
         data.append(k)
-
-
-
-        # print("{spot}".format(spot= )
-
-
-
 
     os.makedirs(name=file_dir, exist_ok=True)
     path = os.path.join(os.getcwd(), file_dir)
@@ -185,8 +166,8 @@ def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name,
 
     header = []
     header.append("DateTime")
-    for i in range(-90, +90, step):
-        header.append(str("{i}_{i_n}").format(i=i, i_n=i+step))
+    for i in range(setting["latitude_step_limit"] * -1, setting["latitude_step_limit"] * +1, setting["latitude_step"]):
+        header.append(str("{i}_{i_n}").format(i=i, i_n = i + setting["latitude_step"]))
 
     fd_w_csv = csv.DictWriter(fd_w, fieldnames=header, delimiter=',', lineterminator='\r\n', quoting=csv.QUOTE_ALL)
     fd_w_csv.writeheader()
@@ -197,7 +178,7 @@ def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name,
     silent_print(silent, "==============")
     return file
 
-def draw_diagram(file: str, silent: bool) -> str:
+def draw_diagram(file: str, setting, silent: bool) -> str:
     silent_print(silent, "==============")
     silent_print(silent, "Draw diagram begin")
     silent_print(silent, "Input File:", file)
@@ -248,6 +229,7 @@ def draw_diagram(file: str, silent: bool) -> str:
 
     # draw
     plt.scatter(x=x, y=y, s=s)
+    plt.title(setting["area_column"])
     plt.xticks(rotation=30)
     plt.xlabel('DateTime')
     plt.ylabel('Latitude')
@@ -261,6 +243,7 @@ def draw_diagram(file: str, silent: bool) -> str:
 #====================================================================================================================================================================================
 #====================================================================================================================================================================================
 
+#Формат таблиц
 FORMAT_S = [
     {"name": "CODE"      , "beg": 1 , "end": 1 , "type": "str", "description": "Data code"                                                                    },
     {"name": "YEAR"      , "beg": 3 , "end": 6 , "type": "str", "description": "Year"                                                                         },
@@ -305,10 +288,22 @@ FORMAT_G = [
 #====================================================================================================================================================================================
 #====================================================================================================================================================================================
 
-PREFIX   = "g"
-
+#Настройки
 BEG_YEAR = 1974
 END_YEAR = 2016
+
+setting = {
+        'latitude_step_limit': 65,           # Значение крайнего положения широты, максимум 90
+        'latitude_step':       5,            # Шаг широты
+        'area_column':         'AREAS_1',    # Колонка площадей пятен, по которой будет производится построение графика
+        'area_multiple':       1,            # Множитель, на которую будет умножаться площадь пятна
+}
+
+#====================================================================================================================================================================================
+#====================================================================================================================================================================================
+
+#Константы
+PREFIX   = "g"
 
 LINK_WEB            = "http://fenyi.solarobs.epss.hun-ren.hu/ftp/pub/DPD/data/{prefix}DPD{year}.txt"
 FITS_DIR            = "PART_1_FITS_ASCCI_{prefix}DPD".format(prefix=PREFIX)
@@ -321,7 +316,7 @@ CSV_CONCAT_FILE     = "CSV_{prefix}DPD_CONCATENATE_{beg}_{end}".format(prefix=PR
 
 CSV_TRANSFORM_DIR   = "PART_4_CSV_{prefix}DPD_TRANSFORM".format(prefix=PREFIX)
 CSV_TRANSFORM_FILE  = "CSV_{prefix}DPD_TRANSFORM_{beg}_{end}".format(prefix=PREFIX, beg=BEG_YEAR, end=END_YEAR)
-CSV_TRANSFORM_STEP  = 5
+
 
 if __name__ == '__main__':
     # Скачиваем
@@ -352,9 +347,10 @@ if __name__ == '__main__':
                                                       fits_csv_file=file_CSV,
                                                       file_dir=CSV_TRANSFORM_DIR,
                                                       file_name=CSV_TRANSFORM_FILE,
-                                                      step = CSV_TRANSFORM_STEP,
+                                                      setting=setting,
                                                       silent=False)
 
     # Рисуем диаграмму
     draw_diagram(file=file_TRANSFORM,
+                 setting=setting,
                  silent=False)
