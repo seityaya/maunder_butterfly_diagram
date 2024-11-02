@@ -150,7 +150,7 @@ def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name,
 
         k = {}
         k["DateTime"] = dt
-        for i in range(setting["latitude_step_limit"] * -1, setting["latitude_step_limit"] * +1, setting["latitude_step"]):
+        for i in range(setting["latitude_limit"] * -1, setting["latitude_limit"] * +1, setting["latitude_step"]):
             f = str("{i}_{i_n}").format(i=i, i_n=i + setting["latitude_step"])
             k[f] = "0"
             if(float(lat) > i and float(lat) < i + setting["latitude_step"]):
@@ -166,7 +166,7 @@ def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name,
 
     header = []
     header.append("DateTime")
-    for i in range(setting["latitude_step_limit"] * -1, setting["latitude_step_limit"] * +1, setting["latitude_step"]):
+    for i in range(setting["latitude_limit"] * -1, setting["latitude_limit"] * +1, setting["latitude_step"]):
         header.append(str("{i}_{i_n}").format(i=i, i_n = i + setting["latitude_step"]))
 
     fd_w_csv = csv.DictWriter(fd_w, fieldnames=header, delimiter=',', lineterminator='\r\n', quoting=csv.QUOTE_ALL)
@@ -293,7 +293,7 @@ BEG_YEAR = 1974
 END_YEAR = 2016
 
 setting = {
-        'latitude_step_limit': 65,           # Значение крайнего положения широты, максимум 90
+        'latitude_limit':      65,           # Значение крайнего положения широты, максимум 90
         'latitude_step':       5,            # Шаг широты
         'area_column':         'AREAS_1',    # Колонка площадей пятен, по которой будет производится построение графика
         'area_multiple':       1,            # Множитель, на которую будет умножаться площадь пятна
