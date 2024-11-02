@@ -154,7 +154,7 @@ def transform_DPD_CSV_to_DIAGRAM_CSV(prefix, fits_csv_file, file_dir, file_name,
             f = str("{i}_{i_n}").format(i=i, i_n=i + setting["latitude_step"])
             k[f] = "0"
             if(float(lat) > i and float(lat) < i + setting["latitude_step"]):
-                k[f] = int(spot) * setting["area_multiple"]
+                k[f] = str(float(float(k[f]) + float(spot)) * setting["area_multiple"])
         data.append(k)
 
     os.makedirs(name=file_dir, exist_ok=True)
@@ -229,7 +229,7 @@ def draw_diagram(file: str, setting, silent: bool) -> str:
 
     # draw
     plt.scatter(x=x, y=y, s=s)
-    plt.title(setting["area_column"])
+    plt.title("area_column: " + setting["area_column"] + ";  area_multiple: " + str(setting["area_multiple"]))
     plt.xticks(rotation=30)
     plt.xlabel('DateTime')
     plt.ylabel('Latitude')
@@ -296,7 +296,7 @@ setting = {
         'latitude_limit':      65,           # Значение крайнего положения широты, максимум 90
         'latitude_step':       1,            # Шаг широты
         'area_column':         'AREAS_1',    # Колонка площадей пятен, по которой будет производится построение графика
-        'area_multiple':       1,            # Множитель, на которую будет умножаться площадь пятна
+        'area_multiple':       0.1,          # Множитель, на которую будет умножаться площадь пятна
 }
 
 #====================================================================================================================================================================================
