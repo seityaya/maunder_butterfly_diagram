@@ -181,8 +181,8 @@ PREFIX   = "g"
 LINK_WEB            = "http://fenyi.solarobs.epss.hun-ren.hu/ftp/pub/DPD/data/{prefix}DPD{year}.txt"
 FITS_DIR            = "123"
 
-FITS_CONCAT_DIR     = "PART_2_FITS_ASCCI_{prefix}DPD_CONCATENATE".format(prefix=PREFIX)
-FITS_CONCAT_FILE    = "123"
+FITS_CONCAT_DIR     = "123"
+FITS_CONCAT_FILE    = "CSV_{prefix}DPD_CONCATENATE_{beg}_{end}".format(prefix=PREFIX, beg=BEG_YEAR, end=END_YEAR)
 
 CSV_CONCAT_DIR      = ""
 CSV_CONCAT_FILE     = "fits"
