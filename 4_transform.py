@@ -4,7 +4,7 @@ import csv
 file_name_in   = "./fits.csv"  # Имя входного файла
 file_name_out  = "./draw.csv"  # Имя выходного файла
 latitude_limit = 65            # Значение крайнего положения широты, максимум 90
-latitude_step  = 1             # Шаг широты
+latitude_step  = 5             # Шаг широты
 area_column    = 'AREAS_1'     # Колонка площадей пятен, по которой будет производится построение графика
 
 #Открываем файл с данными на чтение
@@ -31,7 +31,7 @@ for r in fd_r_csv:
         #Читаем значение широты пятна
         latitude_spot = r["LAT-DE"]
         #Определям в какую колонку широт необходимо поместить значение
-        if(float(latitude_spot) > latitude_beg and float(latitude_spot) < latitude_end):
+        if(float(latitude_spot) >= latitude_beg and float(latitude_spot) < latitude_end):
             #Читаем значение площади пятна в колонке и записываем в новую колонку
             line[latitude] = r[area_column]
     #Добавляем строку в таблицу
