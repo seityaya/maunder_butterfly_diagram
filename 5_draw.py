@@ -5,9 +5,13 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as cl
 import numpy             as np
 
+#Пример входной таблицы
+#            "DateTime", "-90_-45", "-45_-00", "00_45", "45_90"
+# "2000.01.01 00:00:00",       "0",       "0",   "1.1",     "0"
+
 #Настройки
 file_name_in   = "./draw.csv"  # Имя входного файла
-area_multiple  = 0.1           # Множитель, на которую будет умножаться площадь пятна
+area_multiple  = 0.1           # Множитель площади пятна
 
 spot_size_min = 50.0
 spot_size_max = 100.0
