@@ -5,3 +5,5 @@
 !1_download_2_concat_3_convert.py
 !4_transform.py
 !5_draw.py
+!*.png
+!*.md
